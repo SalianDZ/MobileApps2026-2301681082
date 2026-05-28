@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 android {
