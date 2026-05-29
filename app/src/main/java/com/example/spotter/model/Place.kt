@@ -1,4 +1,4 @@
-package com.example.mapdiary.model
+package com.example.spotter.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

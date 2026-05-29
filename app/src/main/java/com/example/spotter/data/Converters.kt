@@ -1,4 +1,4 @@
-package com.example.mapdiary.data
+package com.example.spotter.data
 
 import androidx.room.TypeConverter
 
