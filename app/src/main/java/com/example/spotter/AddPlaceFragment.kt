@@ -2,6 +2,7 @@ package com.example.spotter
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,9 @@ import com.example.spotter.ui.PlaceViewModel
 import com.example.spotter.ui.PlaceViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import java.io.File
+import java.io.FileOutputStream
+import kotlin.getValue
 
 class AddPlaceFragment : Fragment() {
 
@@ -32,19 +36,40 @@ class AddPlaceFragment : Fragment() {
         PlaceViewModelFactory(repository)
     }
 
-    // 1. Клиентът на Google, който отговаря за локацията
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    // 2. Тук ще пазим координатите, преди да ги пратим в базата
+    // Променливи за данните
     private var currentLat: Double? = null
     private var currentLng: Double? = null
+    private var currentImagePath: String? = null // Тук ще пазим пътя до снимката
 
-    // 3. Механизъм за искане на права (Permissions)
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
+    // 1. Стартиране на Камерата и взимане на резултата (Снимката)
+    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap: Bitmap? ->
+        if (bitmap != null) {
+            // Показваме снимката на екрана
+            binding.imageViewPhoto.setImageBitmap(bitmap)
+            binding.imageViewPhoto.visibility = View.VISIBLE
+
+            // Запазваме снимката във файл и взимаме пътя до нея
+            currentImagePath = saveImageToInternalStorage(bitmap)
+        } else {
+            Toast.makeText(requireContext(), "Снимката не беше направена", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // 2. Искане на права за Камерата
+    private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
-            fetchLocation() // Ако потребителят цъкне "Allow", взимаме локацията
+            takePictureLauncher.launch(null) // Отваряме камерата
+        } else {
+            Toast.makeText(requireContext(), "Нужно е разрешение за камерата!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Искане на права за Локация (остава същото)
+    private val requestLocationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            fetchLocation()
         } else {
             Toast.makeText(requireContext(), "Нужно е разрешение за локацията!", Toast.LENGTH_SHORT).show()
         }
@@ -58,51 +83,73 @@ class AddPlaceFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Инициализираме клиента за локация
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        // Слушател за новия бутон "Вземи координати"
+        // Бутон за Локация
         binding.btnGetLocation.setOnClickListener {
             checkLocationPermissionAndFetch()
         }
 
-        // Слушател за бутона "Запази"
+        // НОВО: Бутон за Камера
+        binding.btnCamera.setOnClickListener {
+            checkCameraPermissionAndOpen()
+        }
+
+        // Бутон за Запазване
         binding.btnSave.setOnClickListener {
             savePlaceToDatabase()
         }
     }
 
-    // Проверяваме дали имаме права. Ако да -> взимаме локацията. Ако не -> питаме потребителя.
+    // --- Логика за Камерата ---
+    private fun checkCameraPermissionAndOpen() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            takePictureLauncher.launch(null)
+        } else {
+            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    // Функция, която запазва снимката в телефона и връща пътя до нея
+    private fun saveImageToInternalStorage(bitmap: Bitmap): String {
+        val filename = "spotter_image_${System.currentTimeMillis()}.jpg"
+        val file = File(requireContext().filesDir, filename)
+        try {
+            val outputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return file.absolutePath
+    }
+
+    // --- Логика за Локацията (остава същата) ---
     private fun checkLocationPermissionAndFetch() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fetchLocation()
         } else {
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    // Самата функция, която взима GPS данните от телефона
     private fun fetchLocation() {
-        // Проверяваме отново правата заради сигурността на Android Studio
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return
-        }
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
-                // Запазваме ги в променливите
                 currentLat = location.latitude
                 currentLng = location.longitude
-
-                // Показваме ги на екрана
                 binding.tvCoordinates.text = "Координати: $currentLat, $currentLng"
                 Toast.makeText(requireContext(), "Локацията е взета!", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(requireContext(), "Неуспешно взимане на локация. Включете GPS на емулатора/телефона!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Неуспешно взимане на локация. Включете GPS!", Toast.LENGTH_LONG).show()
             }
         }
     }
 
+    // --- Запазване в Базата ---
     private fun savePlaceToDatabase() {
         val placeName = binding.editTextName.text.toString().trim()
         val placeDesc = binding.editTextDescription.text.toString().trim()
@@ -113,17 +160,18 @@ class AddPlaceFragment : Fragment() {
         }
         binding.layoutName.error = null
 
-        // 4. Създаваме обекта и му подаваме ВЕЧЕ ВЗЕТИТЕ координати
+        // Създаваме обекта, като вече подаваме и ПЪТЯ ДО СНИМКАТА (imagePath)
         val newPlace = Place(
             name = placeName,
             description = placeDesc,
             latitude = currentLat,
             longitude = currentLng,
+            imagePath = currentImagePath, // НОВО!
             tags = listOf("spotter", "маркер")
         )
 
         viewModel.insert(newPlace)
-        Toast.makeText(requireContext(), "Успешно запазено с локация!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Успешно запазено!", Toast.LENGTH_SHORT).show()
         findNavController().popBackStack()
     }
 
