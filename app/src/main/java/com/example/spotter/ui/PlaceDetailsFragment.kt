@@ -14,6 +14,7 @@ import com.example.spotter.data.PlaceRepository
 import com.example.spotter.databinding.FragmentPlaceDetailsBinding
 import com.example.spotter.model.Place
 import java.io.File
+import android.content.Intent
 
 class PlaceDetailsFragment : Fragment() {
 
@@ -72,6 +73,28 @@ class PlaceDetailsFragment : Fragment() {
                     com.example.spotter.R.id.action_placeDetailsFragment_to_editPlaceFragment,
                     bundle
                 )
+            }
+        }
+
+        // 5. Логика за бутона "Отвори в Google Maps"
+        binding.btnOpenMaps.setOnClickListener {
+            val lat = currentPlace?.latitude
+            val lng = currentPlace?.longitude
+            val name = currentPlace?.name ?: "Избрано място"
+
+            if (lat != null && lng != null) {
+                // Създаваме URI, което казва "Отвори карта на тези координати и сложи маркер с това име"
+                val uri = Uri.parse("geo:$lat,$lng?q=$lat,$lng(${Uri.encode(name)})")
+                val mapIntent = Intent(Intent.ACTION_VIEW, uri)
+
+                // Проверяваме дали телефонът има приложение за карти, преди да го отворим (предпазва от крашове)
+                try {
+                    startActivity(mapIntent)
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Няма намерено приложение за карти (Google Maps)!", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(requireContext(), "Това място няма запазени GPS координати.", Toast.LENGTH_SHORT).show()
             }
         }
     }

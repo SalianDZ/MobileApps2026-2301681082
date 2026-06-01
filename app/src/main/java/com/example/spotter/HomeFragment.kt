@@ -45,8 +45,18 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
+        // Наблюдаваме списъка с места
         viewModel.allPlaces.observe(viewLifecycleOwner) { places ->
             placeAdapter.submitList(places)
+
+            // Ако базата е празна, показваме "Празния екран", иначе показваме Решетката
+            if (places.isEmpty()) {
+                binding.layoutEmptyState.visibility = View.VISIBLE
+                binding.recyclerViewPlaces.visibility = View.GONE
+            } else {
+                binding.layoutEmptyState.visibility = View.GONE
+                binding.recyclerViewPlaces.visibility = View.VISIBLE
+            }
         }
 
         binding.fabAddPlace.setOnClickListener {

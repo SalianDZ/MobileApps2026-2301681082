@@ -6,30 +6,34 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:strokeWidth="0dp">
+    app:cardCornerRadius="20dp"
+    app:cardElevation="2dp"
+    app:strokeColor="?attr/colorSurfaceVariant"
+    app:strokeWidth="1dp">
+
+    <!-- Много тънка рамка (strokeWidth) създава луксозен вид и стои перфектно в Dark Mode -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Снимката е малко по-висока за по-добър визуален ефект -->
         <ImageView
             android:id="@+id/imagePlace"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:background="#E0E0E0"
+            android:layout_height="160dp"
+            android:background="?attr/colorSurfaceVariant"
             android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_camera"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@android:drawable/ic_menu_camera" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp"
+            android:padding="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +46,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="Връх Мусала" />
 
@@ -50,12 +54,13 @@
                 android:id="@+id/tvPlaceDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:ellipsize="end"
+                android:lineSpacingExtra="2dp"
                 android:maxLines="2"
                 android:textColor="?android:attr/textColorSecondary"
-                android:textSize="13sp"
-                tools:text="Страхотен преход през уикенда с приятели." />
+                android:textSize="14sp"
+                tools:text="Страхотен преход през уикенда с приятели. Времето беше идеално!" />
 
         </LinearLayout>
 
