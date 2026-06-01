@@ -38,26 +38,26 @@ class AddPlaceFragment : Fragment() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    // Променливи за данните
+    // Променливите
     private var currentLat: Double? = null
     private var currentLng: Double? = null
     private var currentImagePath: String? = null // Тук ще пазим пътя до снимката
 
-    // 1. Стартиране на Камерата и взимане на резултата (Снимката)
+    //логика за камерата, и правенето на снимката
     private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap: Bitmap? ->
         if (bitmap != null) {
             // Показваме снимката на екрана
             binding.imageViewPhoto.setImageBitmap(bitmap)
             binding.imageViewPhoto.visibility = View.VISIBLE
 
-            // Запазваме снимката във файл и взимаме пътя до нея
+            // Запазваме снимката в телефона и получаваме пътя до нея
             currentImagePath = saveImageToInternalStorage(bitmap)
         } else {
             Toast.makeText(requireContext(), "Снимката не беше направена", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // 2. Искане на права за Камерата
+    // 2. Правата за камерата
     private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             takePictureLauncher.launch(null) // Отваряме камерата
@@ -66,7 +66,7 @@ class AddPlaceFragment : Fragment() {
         }
     }
 
-    // Искане на права за Локация (остава същото)
+    // Правата за локацията
     private val requestLocationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
             fetchLocation()
@@ -90,7 +90,7 @@ class AddPlaceFragment : Fragment() {
             checkLocationPermissionAndFetch()
         }
 
-        // НОВО: Бутон за Камера
+        // Бутон за Камера
         binding.btnCamera.setOnClickListener {
             checkCameraPermissionAndOpen()
         }
@@ -101,7 +101,7 @@ class AddPlaceFragment : Fragment() {
         }
     }
 
-    // --- Логика за Камерата ---
+    //Логиката за камерата
     private fun checkCameraPermissionAndOpen() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             takePictureLauncher.launch(null)
@@ -110,7 +110,7 @@ class AddPlaceFragment : Fragment() {
         }
     }
 
-    // Функция, която запазва снимката в телефона и връща пътя до нея
+    // Функция която запазва снимката в телефона и връща пътя до нея
     private fun saveImageToInternalStorage(bitmap: Bitmap): String {
         val filename = "spotter_image_${System.currentTimeMillis()}.jpg"
         val file = File(requireContext().filesDir, filename)
@@ -125,7 +125,7 @@ class AddPlaceFragment : Fragment() {
         return file.absolutePath
     }
 
-    // --- Логика за Локацията (остава същата) ---
+    // Логика за Локацията (остава същата)
     private fun checkLocationPermissionAndFetch() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fetchLocation()
@@ -149,7 +149,7 @@ class AddPlaceFragment : Fragment() {
         }
     }
 
-    // --- Запазване в Базата ---
+    //Запазване в Базата
     private fun savePlaceToDatabase() {
         val placeName = binding.editTextName.text.toString().trim()
         val placeDesc = binding.editTextDescription.text.toString().trim()
@@ -160,7 +160,7 @@ class AddPlaceFragment : Fragment() {
         }
         binding.layoutName.error = null
 
-        // Създаваме обекта, като вече подаваме и ПЪТЯ ДО СНИМКАТА (imagePath)
+        // Създаваме обекта, като вече подаваме и пътя до снимката
         val newPlace = Place(
             name = placeName,
             description = placeDesc,

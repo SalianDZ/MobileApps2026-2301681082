@@ -41,7 +41,7 @@ class PlaceDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Взимаме ID-то на мястото, което сме подали при клик (ще го настроим в Адаптера след малко)
+        // Взимаме ID-то на мястото, което сме подали при клик
         val placeId = arguments?.getInt("placeId") ?: return
 
         // 2. Намираме мястото от списъка и го показваме
@@ -53,7 +53,7 @@ class PlaceDetailsFragment : Fragment() {
             }
         }
 
-        // 3. Логика за бутона "Изтрий"
+        // 3. Логика за бутона делете
         binding.btnDelete.setOnClickListener {
             currentPlace?.let { place ->
                 viewModel.delete(place)
@@ -62,7 +62,7 @@ class PlaceDetailsFragment : Fragment() {
             }
         }
 
-        // 4. Логика за бутона "Редактирай"
+        // 4. Логика за бутона едит
         binding.btnEdit.setOnClickListener { view ->
             currentPlace?.let { place ->
                 val bundle = Bundle().apply {
@@ -76,7 +76,7 @@ class PlaceDetailsFragment : Fragment() {
             }
         }
 
-        // 5. Логика за бутона "Отвори в Google Maps"
+        // 5. Логика за бутона гугъл мапс
         binding.btnOpenMaps.setOnClickListener {
             val lat = currentPlace?.latitude
             val lng = currentPlace?.longitude
@@ -87,7 +87,7 @@ class PlaceDetailsFragment : Fragment() {
                 val uri = Uri.parse("geo:$lat,$lng?q=$lat,$lng(${Uri.encode(name)})")
                 val mapIntent = Intent(Intent.ACTION_VIEW, uri)
 
-                // Проверяваме дали телефонът има приложение за карти, преди да го отворим (предпазва от крашове)
+                // Проверяваме дали телефонът има приложение за карти, преди да го отворим
                 try {
                     startActivity(mapIntent)
                 } catch (e: Exception) {

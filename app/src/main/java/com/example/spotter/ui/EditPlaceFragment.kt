@@ -37,12 +37,12 @@ class EditPlaceFragment : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentPlace: Place? = null
 
-    // Пазим текущите данни, за да не ги загубим, ако променим само едно нещо
+    // Пазим текущите данни за да не ги загубим ако променим само едно нещо
     private var currentLat: Double? = null
     private var currentLng: Double? = null
     private var currentImagePath: String? = null
 
-    // Камера и Локация (същите като при добавянето)
+    // Камера и Локация
     private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap: Bitmap? ->
         if (bitmap != null) {
             binding.imageViewPhoto.setImageBitmap(bitmap)
@@ -148,7 +148,7 @@ class EditPlaceFragment : Fragment() {
         }
 
         currentPlace?.let { place ->
-            // МАГИЯТА: Тук правим КОПИЕ на старото място, но с новите данни и запазваме СЪЩОТО ID!
+            // Тук правим копие на старото място но с новите данни и запазваме СЪЩОТО ID!
             val updatedPlace = place.copy(
                 name = placeName,
                 description = placeDesc,
@@ -156,7 +156,7 @@ class EditPlaceFragment : Fragment() {
                 longitude = currentLng,
                 imagePath = currentImagePath
             )
-            // Извикваме UPDATE вместо Insert
+            // Извикваме ъпдейт вместо инсерта
             viewModel.update(updatedPlace)
             Toast.makeText(requireContext(), "Промените са запазени!", Toast.LENGTH_SHORT).show()
             findNavController().popBackStack()

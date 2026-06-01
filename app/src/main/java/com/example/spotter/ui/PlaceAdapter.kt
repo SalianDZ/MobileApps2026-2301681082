@@ -21,12 +21,12 @@ class PlaceAdapter : ListAdapter<Place, PlaceAdapter.PlaceViewHolder>(PlaceDiffC
         val currentPlace = getItem(position)
         holder.bind(currentPlace)
 
-        // НОВО: Добавяме слушател за клик върху цялата карта
+        // Добавяме слушател за клик върху цялата карта
         holder.itemView.setOnClickListener { view ->
             val bundle = android.os.Bundle().apply {
                 putInt("placeId", currentPlace.id) // Подаваме ID-то на мястото
             }
-            // Отваряме екрана с детайлите (ще го добавим в навигацията в следващата стъпка)
+            // Отваряме екрана с детайлите
             androidx.navigation.Navigation.findNavController(view).navigate(
                 com.example.spotter.R.id.action_homeFragment_to_placeDetailsFragment,
                 bundle
@@ -39,14 +39,14 @@ class PlaceAdapter : ListAdapter<Place, PlaceAdapter.PlaceViewHolder>(PlaceDiffC
             binding.tvPlaceName.text = place.name
             binding.tvPlaceDescription.text = place.description
 
-            // МАГИЯТА Е ТУК: Проверяваме дали мястото има записана снимка
+            // Проверяваме дали мястото има записана снимка
             if (!place.imagePath.isNullOrEmpty()) {
                 val imgFile = File(place.imagePath)
                 if (imgFile.exists()) {
-                    // Ако снимката съществува в телефона, я показваме вляво
+                    // Ако снимката съществува в телефона я показваме
                     binding.imagePlace.setImageURI(Uri.fromFile(imgFile))
                 } else {
-                    // Защита: Ако файлът е изчезнал, показваме иконка по подразбиране
+                    // Ако файлът е изчезнал, показваме иконка по подразбиране
                     binding.imagePlace.setImageResource(android.R.drawable.ic_menu_camera)
                 }
             } else {

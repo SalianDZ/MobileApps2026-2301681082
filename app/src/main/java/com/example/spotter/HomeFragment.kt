@@ -45,7 +45,7 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
-        // Наблюдаваме списъка с места
+        // четем списъка с локации
         viewModel.allPlaces.observe(viewLifecycleOwner) { places ->
             placeAdapter.submitList(places)
 
@@ -63,7 +63,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment_to_addPlaceFragment)
         }
 
-        // Логика за изтриване с плъзгане (Swipe to Delete)
+        // Логика за изтриване с плъзгане
         val itemTouchHelper = androidx.recyclerview.widget.ItemTouchHelper(
             object : androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback(
                 0,

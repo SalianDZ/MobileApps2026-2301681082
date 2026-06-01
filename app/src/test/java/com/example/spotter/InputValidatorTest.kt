@@ -28,7 +28,7 @@ class InputValidatorTest {
         assertEquals(false, result)
     }
 
-    // 4. Тест за правилни GPS координати (напр. София)
+    // 4. Тест за правилни GPS координати
     @Test
     fun `valid coordinates returns true`() {
         val result = InputValidator.hasValidCoordinates(42.6977, 23.3219)

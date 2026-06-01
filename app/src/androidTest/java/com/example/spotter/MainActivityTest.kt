@@ -22,7 +22,7 @@ class MainActivityTest {
         val testPlaceName = "Тестова Локация UI"
         val testPlaceDesc = "Това е автоматизиран UI тест с Espresso"
 
-        // 1. Кликаме на бутона за добавяне (Extended FAB)
+        // 1. Кликаме на бутона за добавяне
         onView(withId(R.id.fabAddPlace)).perform(click())
 
         // 2. Въвеждаме име на мястото
