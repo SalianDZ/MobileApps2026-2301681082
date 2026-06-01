@@ -11,13 +11,11 @@
     app:strokeColor="?attr/colorSurfaceVariant"
     app:strokeWidth="1dp">
 
-    <!-- Много тънка рамка (strokeWidth) създава луксозен вид и стои перфектно в Dark Mode -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Снимката е малко по-висока за по-добър визуален ефект -->
         <ImageView
             android:id="@+id/imagePlace"
             android:layout_width="match_parent"
